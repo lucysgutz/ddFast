@@ -10,8 +10,11 @@ need to curl the repo & make it executable.
 ```bash
 sudo curl -fsSL https://raw.githubusercontent.com/lucysgutz/ddFast/main/ddfast -o /usr/local/bin/ddfast
 sudo chmod +x /usr/local/bin/ddfast
+```
+
 
 ### Example Usage
+
 ```bash
-sudo ddfast /path/to/image.iso sdX
+sudo ddfast /path/to/image.iso sdX ```
 
