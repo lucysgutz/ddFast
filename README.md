@@ -16,5 +16,6 @@ sudo chmod +x /usr/local/bin/ddfast
 ### Example Usage
 
 ```bash
-sudo ddfast /path/to/image.iso sdX ```
+sudo ddfast /path/to/image.iso sdX 
+```
 
