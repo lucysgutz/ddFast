@@ -18,7 +18,7 @@ options:
   -h, --help     show this help message and exit
 
 notes:
-   target_disk must be sdX (x is a placeholder)
+   target_disk must be /dev/sdX (x is a placeholder)
    all data on the target drive will be erased
    requires root privileges (use sudo)
 EOF
@@ -42,9 +42,22 @@ if [[ -z "$SRC" || -z "$DST" ]]; then
   exit 1
 fi
 
+
 [[ "$DST" != /dev/* ]] && DST="/dev/$DST"
+
+
 [[ -f "$SRC" ]] || { echo "file not found: $SRC"; exit 1; }
+
+
 [[ -b "$DST" ]] || { echo "target not found or invalid: $DST"; exit 1; }
+
+
+case "$DST" in
+  /dev/sda|/dev/nvme0n1|/dev/vda)
+    echo "refusing to write to critical system disk $DST"
+    exit 1
+    ;;
+esac
 
 SRC_SIZE=$(stat -c%s "$SRC")
 SRC_H=$(numfmt --to=iec-i --suffix=B "$SRC_SIZE" 2>/dev/null || echo "$SRC_SIZE bytes")
@@ -56,8 +69,9 @@ echo "source: $SRC ($SRC_H)"
 echo "target: $DST ($DST_H)"
 echo
 
-read -r -p "this will erase ALL data on $DST — continue? (type YES): " CONF
+read -r -p "this will erase ALL data on $DST — type YES to continue: " CONF
 [[ "$CONF" == "YES" ]] || { echo "aborted."; exit 1; }
+
 
 for p in $(lsblk -ln -o NAME "$DST" | grep -v "$(basename "$DST")"); do
   umount "/dev/$p" 2>/dev/null || true
@@ -65,11 +79,12 @@ done
 
 sync
 
+
 if command -v pv >/dev/null 2>&1; then
   echo "using pv for progress..."
   pv -tpreb "$SRC" | dd of="$DST" bs=4M iflag=fullblock conv=fsync oflag=direct status=none
 else
-  echo "using dd status=progress..."
+  echo "using dd with status=progress..."
   dd if="$SRC" of="$DST" bs=4M iflag=fullblock conv=fsync oflag=direct status=progress
 fi
 
