@@ -1,6 +1,6 @@
 #  ddFast
 
-**ddFast** — a faster more simplified dd built for iso flashing.
+**ddFast** — a faster more simplified dd, built for iso flashing.
 ---
 
 ###  Install
