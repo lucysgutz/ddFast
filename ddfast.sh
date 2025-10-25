@@ -4,6 +4,31 @@ set -euo pipefail
 
 INSTALL_DIR="/usr/local/lib/ddFast"
 
+show_help() {
+  cat <<EOF
+ddFast - a faster version of dd meant strictly for iso flashing
+
+usage:
+  sudo ddfast <image.iso> <target_disk>
+
+example:
+  sudo ddfast ~/Downloads/os.iso sdX
+
+options:
+  -h, --help     show this help message and exit
+
+notes:
+   target_disk must be sdX (x is a placeholder)
+   all data on the target drive will be erased
+   requires root privileges (use sudo)
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
 if [[ $EUID -ne 0 ]]; then
   echo "run as root (sudo ddfast ...)"
   exit 1
@@ -13,8 +38,7 @@ SRC="${1:-}"
 DST="${2:-}"
 
 if [[ -z "$SRC" || -z "$DST" ]]; then
-  echo "usage: sudo ddfast <image.iso> <target_disk>"
-  echo "example: sudo ddfast ~/Downloads/os.iso sdb"
+  show_help
   exit 1
 fi
 
